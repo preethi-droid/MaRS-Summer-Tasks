@@ -111,7 +111,7 @@ I used Python (`rclpy`) for everything.
 
 ---
 
-# Folder Structure
+#### Folder Structure
 
 ```bash
 ros2_ws/
@@ -131,7 +131,7 @@ avoidance_launch.py
 
 ---
 
-# Part A - Collision Avoidance
+#### Part A - Collision Avoidance
 
 In this part, the turtle continuously checks where it is inside the turtlesim window.
 
@@ -147,7 +147,7 @@ Otherwise, it just keeps moving forward.
 
 ---
 
-# Subscriber
+#### Subscriber
 
 The node subscribes to:
 
@@ -168,7 +168,7 @@ from rclpy.qos import qos_profile_sensor_data
 
 ---
 
-# Publisher
+#### Publisher
 
 The node publishes velocity commands to:
 
@@ -184,7 +184,7 @@ geometry_msgs/msg/Twist
 
 ---
 
-# Safety Threshold Parameter
+#### Safety Threshold Parameter
 
 I created a ROS2 parameter called:
 
@@ -208,7 +208,7 @@ ros2 param set /collision_avoidance_node safety_threshold 3.0
 
 ---
 
-# Launch File
+#### Launch File
 
 I also created a launch file:
 
@@ -230,7 +230,7 @@ ros2 launch turtle_avoidance avoidance_launch.py
 
 ---
 
-# Part B - Circular Patrol using Actions
+### Part B - Circular Patrol using Actions
 
 This part was based on ROS2 Actions.
 
@@ -243,7 +243,7 @@ The turtle moves in a circular path based on the radius sent by the client.
 
 ---
 
-# Custom Action
+#### Custom Action
 
 File:
 
@@ -265,7 +265,7 @@ string current_status
 
 ---
 
-# Circle Logic
+#### Circle Logic
 
 The turtle moves in a circle using:
 
@@ -281,7 +281,7 @@ I fixed the linear velocity and calculated angular velocity dynamically dependin
 
 ---
 
-# Feedback
+#### Feedback
 
 While the turtle moves, the server continuously sends feedback to the client:
 
@@ -293,7 +293,7 @@ The client prints the travelled distance continuously in the terminal.
 
 ---
 
-# Abort Condition
+#### Abort Condition
 
 If the turtle gets too close to the wall while doing the circular patrol:
 - the action gets aborted
@@ -303,9 +303,7 @@ If the turtle gets too close to the wall while doing the circular patrol:
 
 ---
 
-# Running the Project
-
-## Build
+#### Build
 
 ```bash
 cd ~/ros2_ws
@@ -317,7 +315,7 @@ source install/setup.bash
 
 ---
 
-# Run Turtlesim
+#### Run Turtlesim
 
 ```bash
 ros2 run turtlesim turtlesim_node
@@ -325,7 +323,7 @@ ros2 run turtlesim turtlesim_node
 
 ---
 
-# Run Server
+#### Run Server
 
 ```bash
 ros2 run turtle_avoidance circle_patrol_server
@@ -333,7 +331,7 @@ ros2 run turtle_avoidance circle_patrol_server
 
 ---
 
-# Run Client
+#### Run Client
 
 ```bash
 ros2 run turtle_avoidance circle_patrol_client
