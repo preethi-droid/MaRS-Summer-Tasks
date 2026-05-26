@@ -338,3 +338,123 @@ ros2 run turtle_avoidance circle_patrol_client
 ```
 
 ---
+
+### A. ROS 1 vs ROS 2 Architectural Shift
+
+#### 1. ROS 1 Master (roscore) and SPOF
+
+In ROS 1, there is a central system called the **ROS Master (roscore)**.
+
+- It keeps track of all active nodes in the system
+- It helps nodes find each other
+- It manages the communication setup
+
+The problem is:
+
+- If the ROS Master stops working, the whole system breaks
+- Nodes cannot find each other anymore
+- This is called a **Single Point of Failure (SPOF)**
+
+So basically, one process controls everything. If it dies, everything else also dies.
+
+---
+
+#### 2. ROS 2 Decentralized Architecture
+
+ROS 2 does not use a central master.
+
+Instead:
+
+- Each node exists independently
+- Nodes discover each other automatically
+- Communication happens directly between nodes
+
+This is done using **DDS (Data Distribution Service)**.
+
+
+- No central server
+- No single failure point
+- Nodes just join the network and announce themselves
+
+So the system is more like a peer-to-peer network.
+
+---
+
+#### 3. ROS 1 vs ROS 2 Communication
+
+##### ROS 1 (TCPROS / UDPROS)
+
+- Uses **TCPROS** (TCP) or **UDPROS** (UDP)
+- First, nodes ask the ROS Master for information
+- Then they connect directly to each other
+- Master is only used for setup
+
+Flow:
+1. Node registers with roscore
+2. Nodes ask roscore for connection info
+3. Direct connection is created between nodes
+
+---
+
+##### ROS 2 (DDS Wire Protocol)
+
+- Uses **DDS middleware**
+- Communication is continuous and decentralized
+- Nodes publish and subscribe directly through DDS
+
+Flow:
+1. Node joins network
+2. DDS discovery finds other nodes
+3. Data flows through DDS automatically
+
+No central lookup step is needed.
+
+---
+
+### B. DDS (Data Distribution Service)
+
+DDS is the middleware that makes ROS 2 work without a master.
+
+---
+
+#### 1. Discoverability Mechanism (How nodes find each other)
+
+When two ROS 2 nodes are on the same Wi-Fi:
+
+- They use **Simple Discovery Protocol (SDP)**
+- They send **multicast UDP packets** on the network
+- These packets announce:
+  - Node name
+  - Topics
+  - Data types
+
+So:
+
+- Every node "shouts" what it offers
+- Other nodes listen and connect automatically
+
+No server is needed. Only network broadcasting.
+
+---
+
+#### 2. DDS Vendors in ROS 2
+
+ROS 2 supports multiple DDS implementations.
+
+Common ones:
+
+- **eProsima Fast DDS**
+- **Eclipse Cyclone DDS**
+- **RTI Connext DDS**
+
+There are others too, but these are the main ones used.
+
+---
+
+### Switching DDS implementation
+
+You can switch DDS vendors using this environment variable:
+
+```bash
+RMW_IMPLEMENTATION
+```
