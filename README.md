@@ -98,246 +98,57 @@ ros2 run cpp_pubsub talker
 ros2 run cpp_pubsub listener
 ```
 
-##Task 2
+## Task 2
+This was about some ROS2 implementations using Turtlesim. This includes QoS, dynamic parameters, launch files and custom actions. It was also about the architectural shift from ROS1 to ROS2.
 
-### ROS2 Turtle Avoidance
+### Subtask A: Auto-Avoidance Telemetry Node
+First, a python package named turtle_safety is created inside our workspace.
 
-This has 2 main parts:
+#### QoS Profiles and Parameters 
+In this node, we subscribed to the turtle's position (/turtle1/pose). Instead of default settings, we used qos_profile_sensor_data. This is because sensor data needs to be fast. If a position packet is delayed on the network, it is better to drop it and get the newest one rather than wait.
 
-- Collision avoidance using publishers/subscribers
-- Circular patrol using ROS2 Actions
-
-I used Python (`rclpy`) for everything.
-
----
-
-#### Folder Structure
-
-```bash
-ros2_ws/
-└── src/
-    └── turtle_avoidance/
-```
-
-Main files:
-
-```bash
-collision_avoidance_node.py
-circle_patrol_server.py
-circle_patrol_client.py
-ExecuteCircle.action
-avoidance_launch.py
-```
-
----
-
-#### Part A - Collision Avoidance
-
-In this part, the turtle continuously checks where it is inside the turtlesim window.
-
-The turtlesim area is roughly:
-
-```text
-11 x 11
-```
-
-If the turtle gets too close to a wall, it automatically turns away
-
-Otherwise, it just keeps moving forward.
-
----
-
-#### Subscriber
-
-The node subscribes to:
-
-```bash
-/turtle1/pose
-```
-
-to get:
-- x coordinate
-- y coordinate
-- orientation (`theta`)
-
-I used the sensor QoS profile for this:
-
-```python
-from rclpy.qos import qos_profile_sensor_data
-```
-
----
-
-#### Publisher
-
-The node publishes velocity commands to:
-
-```bash
-/turtle1/cmd_vel
-```
-
-using:
-
-```python
-geometry_msgs/msg/Twist
-```
-
----
-
-#### Safety Threshold Parameter
-
-I created a ROS2 parameter called:
-
-```python
-safety_threshold
-```
-
-Default value:
-
-```python
-1.5
-```
-
-This controls how close the turtle is allowed to go near walls before turning.
-
-It can also be changed during runtime without restarting the node:
+We also declared a dynamic parameter called safety_threshold to act as a safety bubble around the turtle. To change this parameter while the node is running (without restarting the code), we use:
 
 ```bash
 ros2 param set /collision_avoidance_node safety_threshold 3.0
 ```
-
----
-
-#### Launch File
-
-I also created a launch file:
+#### Launch Files and Topic Remapping
+To avoid opening many terminals, we wrote a launch file avoidance_launch.py that starts the simulator and our safety node together, while passing a custom value for the safety parameter.
 
 ```bash
-avoidance_launch.py
+ros2 launch turtle_safety avoidance_launch.py
 ```
 
-This launches:
-- turtlesim node
-- collision avoidance node
-
-together.
-
-Run using:
+We wanted to control the turtle manually, but if both our keyboard and our safety node publish to /turtle1/cmd_vel, the turtle will glitch. To fix this, we remapped the keyboard topic to /user_cmd_vel
 
 ```bash
-ros2 launch turtle_avoidance avoidance_launch.py
+ros2 run turtlesim turtle_teleop_key --ros-args -r /turtle1/cmd_vel:=/user_cmd_vel
 ```
 
----
+### Subtask B: Circular Patrol & Actions
+Actions are used for long-running tasks where we need a Goal, continuous Feedback, and a final Result.
 
-### Part B - Circular Patrol using Actions
-
-This part was based on ROS2 Actions.
-
-I created:
-- a custom action
-- an action server
-- an action client
-
-The turtle moves in a circular path based on the radius sent by the client.
-
----
-
-#### Custom Action
-
-File:
+#### Creating the Interface Package
+Because custom messages and actions must be built using Cmake, we had to create a separate C++ package just for the action file.
 
 ```bash
-ExecuteCircle.action
+ros2 pkg create --build-type ament_cmake turtle_interfaces
 ```
 
-Structure:
+Inside, we defined ExecuteCircle.action which takes a radius goal, gives distance traveled as feedback, and returns a success boolean as a result.
 
-```text
-float32 radius
----
-bool success
-string final_report
----
-float32 distance_traveled
-string current_status
-```
+#### Action Server and Client
+Back in our python package, we wrote the server and client. The Action Server does the math to drive in a circle (w = v / radius). We had to use a MultiThreadedExecutor so the node could drive the motors and check the wall sensors at the exact same time.
 
----
-
-#### Circle Logic
-
-The turtle moves in a circle using:
-
-```text
-w = v / radius
-```
-
-where:
-- `v` = linear velocity
-- `w` = angular velocity
-
-I fixed the linear velocity and calculated angular velocity dynamically depending on the radius.
-
----
-
-#### Feedback
-
-While the turtle moves, the server continuously sends feedback to the client:
-
-```python
-feedback_msg.distance_traveled = distance
-```
-
-The client prints the travelled distance continuously in the terminal.
-
----
-
-#### Abort Condition
-
-If the turtle gets too close to the wall while doing the circular patrol:
-- the action gets aborted
-- the turtle stops
-- a failure message is returned
-
-
----
-
-#### Build
-
+To run the Action Server:
 ```bash
-cd ~/ros2_ws
-
-colcon build
-
-source install/setup.bash
+ros2 run turtle_safety circle_patrol_server
 ```
 
----
-
-#### Run Turtlesim
-
+To run the Action Client (asking the turtle to drive a circle with a radius of 2.0 meters):
 ```bash
-ros2 run turtlesim turtlesim_node
+ros2 run turtle_safety circle_patrol_client 2.0
 ```
-
----
-
-#### Run Server
-
-```bash
-ros2 run turtle_avoidance circle_patrol_server
-```
-
----
-
-#### Run Client
-
-```bash
-ros2 run turtle_avoidance circle_patrol_client
-```
-
----
 
 ### A. ROS 1 vs ROS 2 Architectural Shift
 
