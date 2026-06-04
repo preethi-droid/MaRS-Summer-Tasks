@@ -101,6 +101,8 @@ ros2 run cpp_pubsub listener
 ## Task 2
 This was about some ROS2 implementations using Turtlesim. This includes QoS, dynamic parameters, launch files and custom actions. It was also about the architectural shift from ROS1 to ROS2.
 
+---
+
 ### Subtask A: Auto-Avoidance Telemetry Node
 First, a python package named turtle_safety is created inside our workspace.
 
@@ -112,6 +114,9 @@ We also declared a dynamic parameter called safety_threshold to act as a safety 
 ```bash
 ros2 param set /collision_avoidance_node safety_threshold 3.0
 ```
+
+---
+
 #### Launch Files and Topic Remapping
 To avoid opening many terminals, we wrote a launch file avoidance_launch.py that starts the simulator and our safety node together, while passing a custom value for the safety parameter.
 
@@ -125,6 +130,8 @@ We wanted to control the turtle manually, but if both our keyboard and our safet
 ros2 run turtlesim turtle_teleop_key --ros-args -r /turtle1/cmd_vel:=/user_cmd_vel
 ```
 
+---
+
 ### Subtask B: Circular Patrol & Actions
 Actions are used for long-running tasks where we need a Goal, continuous Feedback, and a final Result.
 
@@ -136,6 +143,8 @@ ros2 pkg create --build-type ament_cmake turtle_interfaces
 ```
 
 Inside, we defined ExecuteCircle.action which takes a radius goal, gives distance traveled as feedback, and returns a success boolean as a result.
+
+---
 
 #### Action Server and Client
 Back in our python package, we wrote the server and client. The Action Server does the math to drive in a circle (w = v / radius). We had to use a MultiThreadedExecutor so the node could drive the motors and check the wall sensors at the exact same time.
@@ -149,6 +158,8 @@ To run the Action Client (asking the turtle to drive a circle with a radius of 2
 ```bash
 ros2 run turtle_safety circle_patrol_client 2.0
 ```
+
+---
 
 ### A. ROS 1 vs ROS 2 Architectural Shift
 

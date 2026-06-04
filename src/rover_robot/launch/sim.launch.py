@@ -11,36 +11,37 @@ def generate_launch_description():
     pkg_path = get_package_share_directory(pkg_name)
     xacro_file = os.path.join(pkg_path, 'urdf', 'robot.urdf.xacro')
     
-    # Parse Xacro to string
+    
     doc = xacro.parse(open(xacro_file))
     xacro.process_doc(doc)
     robot_description = {'robot_description': doc.toxml()}
 
-    # Publish the robot state to TF
+    
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         output='screen',
-        parameters=[robot_description]
+        parameters=[robot_description, {'use_sim_time':True}]
     )
     
-    # Node to publish the joint states (required for continuous wheel joints)
+    
     node_joint_state_publisher = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
-        name='joint_state_publisher'
+        name='joint_state_publisher',
+        parameters=[{'use_sim_time':True}]
     )
     
     world_file = os.path.join(pkg_path, 'worlds', 'obstacle_course.sdf')
 
-    # Launch Gazebo Ignition (empty world)
+    
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
         launch_arguments={'gz_args': f'-r {world_file}'}.items()
     )
 
-    # Spawn the robot in Gazebo
+    
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',

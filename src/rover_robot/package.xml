@@ -3,7 +3,7 @@
 <package format="3">
   <name>rover_robot</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Gazebo Ignition Sim</description>
   <maintainer email="preethiabhiramik@gmail.com">preethi</maintainer>
   <license>Apache-2.0</license>
 
