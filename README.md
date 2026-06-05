@@ -330,4 +330,45 @@ These nodes are launched together with the simulation.
 
 ### TF Tree
 
+TF trees define the relationship between coordinate frames of the robot.
 
+The TF tree was visualized in RViz2 to verify that all transforms were being published correctly.
+
+---
+
+### Building the Package
+
+```bash
+colcon build --packages-select rover_robot --symlink-install
+```
+
+---
+
+### Running the Simulation
+
+To launch the gazebo and spawn the rover
+```bash
+ros2 launch rover_robot sim.launch.py
+```
+
+Gazebo Bridge to synchronize ROS2 topics with Gazebo topics
+```bash
+ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist /model/rover_robot/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry /model/rover_robot/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V /clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock --ros-args -r /model/rover_robot/tf:=/tf
+```
+
+For teleoperation
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+RViz2
+```bash
+rviz2 --ros-args -p use_sim_time:=true
+```
+
+To run the tf2_tools
+```bash
+ros2 run tf2_tools view_frames
+```
+
+---
