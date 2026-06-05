@@ -280,3 +280,54 @@ You can switch DDS vendors using this environment variable:
 ```bash
 RMW_IMPLEMENTATION
 ```
+
+---
+
+## Task 3
+
+This task involved creating a 4-wheel rover using Xacro/URDF, spawning it inside Ignition Gazebo, visualizing it in RViz2, and understanding TF trees and state publishers.
+
+---
+
+### Robot Description using Xacro
+
+The robot was modeled using Xacro.
+
+The model consists of:
+
+- A central chassis represented by a rectangular box
+- Four wheels attached to the chassis
+- Continuous joints connecting the wheels
+- Visual, collision and inertial properties
+
+Xacro properties were used to make dimensions and masses easier to modify.
+
+---
+
+### Gazebo Simulation
+
+A custom SDF world was created and loaded through a launch file.
+
+The world contains:
+
+- Ground plane
+- Lighting
+- Custom obstacle objects
+
+The rover is spawned automatically when the launch file is executed.
+
+---
+
+### Robot State Publisher and Joint State Publisher
+
+The robot_state_publisher node publishes transforms generated from the URDF model.
+
+The joint_state_publisher node publishes wheel joint states so that wheel positions and rotations can be visualized correctly in RViz2.
+
+These nodes are launched together with the simulation.
+
+---
+
+### TF Tree
+
+
