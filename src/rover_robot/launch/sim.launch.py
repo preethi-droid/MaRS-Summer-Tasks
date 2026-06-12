@@ -25,6 +25,20 @@ def generate_launch_description():
     )
     
     
+    broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+    )
+
+    
+    arm_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["arm_controller", "--controller-manager", "/controller_manager"],
+    )
+    
+    
     node_joint_state_publisher = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
@@ -53,6 +67,8 @@ def generate_launch_description():
 
     return LaunchDescription([
         node_robot_state_publisher,
+        broadcaster_spawner,
+        arm_spawner,
         node_joint_state_publisher,
         gazebo,
         spawn_entity
