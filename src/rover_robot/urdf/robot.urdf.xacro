@@ -44,6 +44,7 @@
         <origin xyz="0.15 0 0.05" rpy="0 0 0"/>
         <axis xyz="0 1 0"/> 
         <limit lower="-0.785" upper="0.785" effort="10.0" velocity="1.0"/> 
+        <dynamics damping="1.0" friction="0.5"/>
     </joint>
 
     <link name="camera_arm">
@@ -144,6 +145,29 @@
         </hardware>
         <joint name="camera_arm_joint">
             <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="front_left_wheel_joint">
+            <command_interface name="velocity"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="front_right_wheel_joint">
+            <command_interface name="velocity"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="rear_left_wheel_joint">
+            <command_interface name="velocity"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="rear_right_wheel_joint">
+            <command_interface name="velocity"/>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
         </joint>

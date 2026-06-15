@@ -18,3 +18,9 @@ arm_controller:
     state_interfaces:
       - position
       - velocity
+      
+    gains:
+      camera_arm_joint:
+        p: 20.0
+        i: 0.1
+        d: 1.5

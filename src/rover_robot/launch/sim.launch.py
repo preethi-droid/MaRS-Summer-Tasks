@@ -38,13 +38,13 @@ def generate_launch_description():
         arguments=["arm_controller", "--controller-manager", "/controller_manager"],
     )
     
-    
-    node_joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        parameters=[{'use_sim_time':True}]
-    )
+   
+#    node_joint_state_publisher = Node(
+#        package='joint_state_publisher',
+#        executable='joint_state_publisher',
+#        name='joint_state_publisher',
+#        parameters=[{'use_sim_time':True}]
+#    )
     
     world_file = os.path.join(pkg_path, 'worlds', 'obstacle_course.sdf')
 
@@ -69,7 +69,7 @@ def generate_launch_description():
         node_robot_state_publisher,
         broadcaster_spawner,
         arm_spawner,
-        node_joint_state_publisher,
+        #node_joint_state_publisher,
         gazebo,
         spawn_entity
     ])
