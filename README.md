@@ -372,3 +372,59 @@ ros2 run tf2_tools view_frames
 ```
 
 ---
+
+## Task 4
+
+This task was about upgrading our basic rover. We added sensors (a camera, LiDAR, and IMU), set up a control system to move the robot's arm, and built a data bridge so Gazebo and RViz2 could talk to each other properly.
+
+---
+
+### Adding Sensors with Xacro
+
+We edited our robot's Xacro file to add three new pieces of hardware:
+
+- **LiDAR:** Mounted on top of a pole (mast) to scan the room 360 degrees and look for obstacles.
+- **Camera:** Placed on the robot's arm to give us a live video feed.
+- **IMU:** Hidden inside the main body to measure the robot's acceleration and tilt.
+
+---
+
+### Controlling the Robot (Drivetrain vs. Arm)
+
+We split the robot's movement into two separate control systems so they wouldn't interfere with each other:
+
+- **Driving the Wheels:** Handled by Gazebo's built-in `DiffDrive` plugin. It takes our keyboard inputs (`/cmd_vel`) and spins the wheels.
+- **Moving the Arm:** Handled by `ros2_control`. This system focuses purely on the arm's joint, letting us lift or rotate the camera smoothly without messing up the wheel movements.
+
+---
+
+### Sharing Joint Positions
+
+If a joint moves in Gazebo, RViz2 needs to know about it instantly so the 3D hologram does not glitch out:
+
+- **Wheel Rotations:** We added an Ignition plugin that watches the wheels spin and sends those exact spinning angles over to RViz2.
+- **Fixed Parts (IMU):** Since the IMU is glued tight to the chassis and does not have a moving joint, we added a Pose Publisher plugin to force Gazebo to tell RViz2 exactly where it is at all times.
+
+---
+
+### Setting up the Network Bridge
+
+We set up a giant command-line bridge that translates everything—keyboard commands, camera video, LiDAR scans, and structural transforms (TFs), so both programs stay perfectly in sync. 
+
+We also switched the center of the world in RViz2 to `odom` so that the virtual camera stays fixed to the ground while the rover drives away.
+
+---
+
+### Running the Simulation
+
+Updated Gazebo Bridge to synchronize ROS2 topics with Gazebo topics
+```bash
+ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist /model/rover_robot/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry /model/rover_robot/tf@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V /clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock /scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan /camera/image_raw@sensor_msgs/msg/Image[ignition.msgs.Image /camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo /imu@sensor_msgs/msg/Imu[ignition.msgs.IMU /joint_states@sensor_msgs/msg/JointState[ignition.msgs.Model --ros-args -r /model/rover_robot/tf:=/t
+```
+
+To launch the arm controller slider panel
+```bash
+ros2 run rqt_joint_trajectory_controller rqt_joint_trajectory_controller
+```
+
+---
